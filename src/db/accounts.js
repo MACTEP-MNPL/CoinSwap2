@@ -64,4 +64,24 @@ export const deleteAccountByChat = async (chatId) => {
         throw error;
     }
 };
-    
+
+export const deleteAccountById = async (id) => {
+    try {
+        const [result] = await db.execute(
+            'DELETE FROM accounts WHERE id = ?',
+            [id]
+        );  
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAccountById = async (id) => {
+    const [result] = await db.execute(
+        'SELECT * FROM accounts WHERE id = ?',
+        [id]
+    );
+    return result[0];
+};

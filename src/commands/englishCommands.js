@@ -9,6 +9,11 @@ import { getMoscow, getMakhachkala } from "../db/cities.js"
 import { createNewBalance, deleteBalanceByName, resetBalance, getBalanceByAccountIdAndCurrency } from "../db/balances.js"
 import { undoCreatingNewBalanceMenu, undoClearingBalanceMenu, undoDeletingNewBalanceMenu } from "../menus/undoMenus.js"
 import { deleteAccountByChat } from "../db/accounts.js"
+import ExcelJS from 'exceljs'
+import { getABCEXCommandMessage } from "../messages/getABCEXCommandMessage.js"
+import { InputFile } from "grammy"
+import { InlineKeyboard } from "grammy"
+
 
 export const englishCommands = new Composer()
 
@@ -386,7 +391,6 @@ englishCommands.command('help', async (ctx) => {
     `<code>/remove</code> - удалить валюту\n` +
     `<code>/del</code> - очистить баланс валюты\n` +
     `<code>/reset</code> - удалить текущий счёт\n` +
-    `<code>/grx</code> - курс garantex\n` +
     `<code>/abc</code> - курс ABCEX\n` +
     `<code>/forex</code> - курс forex\n` +
     `<code>/usdt_ex</code> - курс USDT на биржах\n` +
@@ -398,7 +402,7 @@ englishCommands.command('help', async (ctx) => {
     `<code>/admin</code> - админ панель`, {parse_mode: 'HTML'})
 })
 
-englishCommands.hears('reset', async (ctx) => {
+englishCommands.command('reset', async (ctx) => {
     if (!await isUser2Lvl(ctx)) {
         return;
     }
@@ -415,7 +419,13 @@ englishCommands.hears('reset', async (ctx) => {
     await ctx.reply(`❌ Аккаунт <code>#${account.name}</code> в этом чате успешно удален`, {parse_mode: 'HTML'});
 })
 
-englishCommands.hears('summ', async (ctx) => {
+const dropKeyboard = new InlineKeyboard().text('🗑 Сверить выписку', 'drop_summary')
+
+englishCommands.command('summ', async (ctx) => {
+    if (!await isAdmin(ctx)) {
+        return;
+    }
+
     try {
         const account = await getAccountByChat(ctx.chat.id);
         
@@ -441,7 +451,7 @@ englishCommands.hears('summ', async (ctx) => {
             FROM transactions t
             LEFT JOIN users u ON t.user_id = u.id
             LEFT JOIN accounts a ON t.account_id = a.id
-            WHERE t.account_id = ?
+            WHERE t.account_id = ? AND t.is_shown = TRUE
             ORDER BY t.created_at DESC`,
             [account.id]
         );
@@ -518,12 +528,13 @@ englishCommands.hears('summ', async (ctx) => {
             const balanceCell = row.getCell('balance');
 
             [amountCell, balanceCell].forEach(cell => {
-                const value = parseFloat(cell.value);
+                // Format the value using nFormat before setting it
+                cell.value = nFormat(cell.value);
                 cell.numFmt = '#,##0.00';
                 cell.font = {
                     name: 'Arial',
                     size: 11,
-                    color: { argb: value < 0 ? 'FF0000' : '008000' }
+                    color: { argb: parseFloat(cell.value.replace(/,/g, '')) < 0 ? 'FF0000' : '008000' }
                 };
             });
 
@@ -558,7 +569,8 @@ englishCommands.hears('summ', async (ctx) => {
             ),
             {
                 caption: `<blockquote>#${account.name}</blockquote>\nВыписка по счету`,
-                parse_mode: 'HTML'
+                parse_mode: 'HTML',
+                reply_markup: dropKeyboard
             }
         );
 
@@ -567,6 +579,11 @@ englishCommands.hears('summ', async (ctx) => {
         await ctx.reply('❌ Произошла ошибка при создании выписки');
         throw error;
     }
+})
+
+englishCommands.command('abc', async (ctx) => {
+    const message = await getABCEXCommandMessage()
+    await ctx.reply(message, {parse_mode: 'HTML', disable_web_page_preview: true})
 })
 
 

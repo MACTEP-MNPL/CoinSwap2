@@ -35,8 +35,8 @@ topUpBalanceByNameCommand.hears(/^\/([a-zA-Z]+)\s+.+/, async (ctx) => {
 
         // Replace keywords with their values
         expression = expression
-            .replace(/гара/g, api.GarantexBuyDollar)
-            .replace(/абц/g, api.ABCEXBuyDollar);
+            .replace(/абц/g, api.ABCEXBuyDollar)
+            .replace(/,/g, '.');
 
         // Evaluate the expression
         let amount = math.evaluate(expression);
@@ -113,8 +113,37 @@ topUpBalanceByNameCommand.hears(/^\/([a-zA-Z]+)\s+.+/, async (ctx) => {
 topUpBalanceByNameCommand.hears(/^\/([а-яА-Я]+)\s+(-?\d+\.?\d*)\s*(.*)$/, async (ctx) => {
     try {
         const currency = ctx.match[1].toUpperCase();
-        const amountStr = ctx.match[2].trim();
-        const comment = ctx.match[3].trim() || 'ПОПОЛНЕНИЕ СЧЕТА';
+        const fullText = ctx.message.text.slice(currency.length + 1).trim(); // +1 for the slash
+
+        // Split by space to get expression and comment
+        let [expression, ...commentParts] = fullText.split(' ');
+
+        if (!expression) {
+            await ctx.reply(
+                'Укажите сумму и комментарий (комментарий необязателен).\n' +
+                `Пример: <code>/${currency.toLowerCase()} 500</code> или <code>/${currency.toLowerCase()} -500</code> или <code>/${currency.toLowerCase()} 500 зарплата</code>`, 
+                {parse_mode: 'HTML'}
+            );
+            return;
+        }
+
+        // Join comment parts back together in case there are spaces in the comment
+        const comment = commentParts.join(' ').trim() || 'ПОПОЛНЕНИЕ СЧЕТА';
+
+        console.log(expression, comment);
+
+        // Replace keywords with their values
+        expression = expression
+            .replace(/абц/g, api.ABCEXBuyDollar)
+            .replace(/,/g, '.');
+
+        // Evaluate the expression
+        let amount = math.evaluate(expression);
+
+        if (isNaN(amount)) {
+            await ctx.reply('❌ Неверный формат выражения');
+            return;
+        }
 
         const account = await getAccountByChat(ctx.chat.id);
 
@@ -129,7 +158,6 @@ topUpBalanceByNameCommand.hears(/^\/([а-яА-Я]+)\s+(-?\d+\.?\d*)\s*(.*)$/, as
 
         const balances = await getAccountBalances(account.id);
         const hasBalance = balances.some(b => b.currency.toLowerCase() === currency.toLowerCase());
-
         
         if (!hasBalance) {
             await ctx.reply(
@@ -140,22 +168,17 @@ topUpBalanceByNameCommand.hears(/^\/([а-яА-Я]+)\s+(-?\d+\.?\d*)\s*(.*)$/, as
             return;
         }
 
-        let amount = parseFloat(amountStr);
-
         if (isNaN(amount)) {
             await ctx.reply('❌ Неверный формат числа');
             return;
         }
 
         // Get the balance before update
-
         const [balance] = await getBalanceByAccountIdAndCurrency(account.id, currency);
-
-        console.log('balance', balance);
         
         // Update the balance
         const newBalance = await updateBalance(ctx.chat.id, currency, amount);
-
+        
         // Create a transaction record
         await createNewTransaction(
             balance.id,

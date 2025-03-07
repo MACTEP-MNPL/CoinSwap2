@@ -29,12 +29,10 @@ const handleBalanceUpdate = async (ctx, currency, commandName) => {
         // Join comment parts back together in case there are spaces in the comment
         const comment = commentParts.join(' ').trim() || 'ПОПОЛНЕНИЕ СЧЕТА';
 
-        console.log(expression, comment);
-
         // Replace keywords with their values
         expression = expression
-            .replace(/гара/g, api.GarantexBuyDollar)
-            .replace(/абц/g, api.ABCEXBuyDollar);
+            .replace(/абц/g, api.ABCEXBuyDollar)
+            .replace(/,/g, '.');
 
         // Evaluate the expression
         let amount = math.evaluate(expression);
@@ -106,6 +104,6 @@ const handleBalanceUpdate = async (ctx, currency, commandName) => {
 topUpBalanceCommands.hears(/^\/тез\s+.+/, ctx => handleBalanceUpdate(ctx, 'USDT', '/тез'));
 topUpBalanceCommands.hears(/^\/руб\s+.+/, ctx => handleBalanceUpdate(ctx, 'RUB', '/руб'));
 topUpBalanceCommands.hears(/^\/евр\s+.+/, ctx => handleBalanceUpdate(ctx, 'EUR', '/евр'));
-topUpBalanceCommands.hears(/^\/дол\s+.+/, ctx => handleBalanceUpdate(ctx, 'USD', '/дол'));
+topUpBalanceCommands.hears(/^\/бакс\s+.+/, ctx => handleBalanceUpdate(ctx, 'USD', '/бакс'));
 
 

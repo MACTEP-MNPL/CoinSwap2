@@ -4,6 +4,7 @@ import { nCode} from "../utils/n.js"
 import { isAdmin } from "../utils/userLvl.js"
 import { isPrivate } from "../utils/isPrivate.js"
 import { InlineKeyboard } from "grammy";
+import { nFormat } from "../utils/n.js";
 
 const updateKeyboard = new InlineKeyboard()
     .text("🔄 Обновить", "update-cities");
@@ -15,11 +16,11 @@ const getCitiesMessage = async () => {
     const makhachkala = await getMakhachkala()
 
     return `🏙️ <b>Москва</b> - CoinSwap \n` +
-           `<b>├ Купить</b> - ${nCode(moscow.buy_price)} ₽\n` +
-           `<b>└ Продать</b> - ${nCode(moscow.sell_price)} ₽\n\n` +
+           `<b>├ Купить</b> - <code>${nFormat(moscow.buy_price)}</code> ₽\n` +
+           `<b>└ Продать</b> - <code>${nFormat(moscow.sell_price)}</code> ₽\n\n` +
            `🌄 <b>Махачкала</b> - CoinSwap\n` +
-           `<b>├ Купить</b> - ${nCode(makhachkala.buy_price)} ₽\n` +
-           `<b>└ Продать</b> - ${nCode(makhachkala.sell_price)} ₽`;
+           `<b>├ Купить</b> - <code>${nFormat(makhachkala.buy_price)}</code> ₽\n` +
+           `<b>└ Продать</b> - <code>${nFormat(makhachkala.sell_price)}</code> ₽`;
 }
 
 citiesHears.hears("🏙 Города", async (ctx) => {

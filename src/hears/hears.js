@@ -8,7 +8,7 @@ import {usdtExHears} from "./usdtExHears.js"
 import {tarifsHears} from "./tarifsHears.js"
 import { totalHears } from "./totalHears.js"
 import { ExHears } from "./XeHears.js"
-
+import { deleteAccountHears } from "./deleteAccountHears.js"
 
 export const hears = new Composer()
 
@@ -21,3 +21,4 @@ hears.use(usdtExHears)
 hears.use(tarifsHears)
 hears.use(totalHears)   
 hears.use(ExHears)
+hears.use(deleteAccountHears)

@@ -8,12 +8,15 @@ import { nFormat, nCode } from "../utils/n.js"
 import { getMoscow, getMakhachkala } from "../db/cities.js"
 import { createNewBalance, deleteBalanceByName, resetBalance, getBalanceByAccountId, getBalanceByAccountIdAndCurrency} from "../db/balances.js"
 import { undoCreatingNewBalanceMenu, undoClearingBalanceMenu, undoDeletingNewBalanceMenu } from "../menus/undoMenus.js"
-import { getGarantexCommandMessage } from "../messages/getGarantexCommandMessage.js"
 import { getABCEXCommandMessage } from "../messages/getABCEXCommandMessage.js"
 import { createNewTransaction } from "../db/transactions.js"
 import { InputFile } from "grammy"
 import ExcelJS from 'exceljs'
 import { deleteAccountByChat } from "../db/accounts.js"
+import { InlineKeyboard } from "grammy"
+import { hideTransactionsByCtx } from "../db/transactions.js"
+
+
 
 export const russianCommands = new Composer()   
 
@@ -373,14 +376,47 @@ russianCommands.hears(/^\/очистить\s+(.+)$/, async (ctx) => {
     }
 });
 
-russianCommands.hears('/гара', async (ctx) => {
-    const message = await getGarantexCommandMessage()
-    await ctx.reply(message, {parse_mode: 'HTML', disable_web_page_preview: true})
-})
-
 russianCommands.hears('/абц', async (ctx) => {
     const message = await getABCEXCommandMessage()
     await ctx.reply(message, {parse_mode: 'HTML', disable_web_page_preview: true})
+})
+
+const dropKeyboard = new InlineKeyboard().text('🗑 Сверить выписку', 'drop_summary')
+const dropFinalKeyboard = new InlineKeyboard()
+.text('Нет', 'cancel_summary')
+.text('Да', 'finalDrop_summary')
+
+russianCommands.callbackQuery('drop_summary', async (ctx) => {
+    if(!await isAdmin(ctx)) {
+        return;
+    }
+
+    await ctx.reply('❗️ Вы уверены, что хотите обнулить выписку?', {reply_markup: dropFinalKeyboard})
+})
+
+russianCommands.callbackQuery('cancel_summary', async (ctx) => {
+    if(!await isAdmin(ctx)) {
+        return;
+    }
+
+    await ctx.deleteMessage()
+
+    await ctx.reply('Действие было успешно отменено 👍', {parse_mode: 'HTML'})
+
+})
+
+
+russianCommands.callbackQuery('finalDrop_summary', async (ctx) => {
+    if(!await isAdmin(ctx)) {
+        return;
+    }
+
+    await ctx.deleteMessage()
+
+    await hideTransactionsByCtx(ctx)
+
+    await ctx.reply('Выписка была успешно сверена 👍', {parse_mode: 'HTML'})
+
 })
 
 russianCommands.hears('/выписка', async (ctx) => {
@@ -413,7 +449,7 @@ russianCommands.hears('/выписка', async (ctx) => {
             FROM transactions t
             LEFT JOIN users u ON t.user_id = u.id
             LEFT JOIN accounts a ON t.account_id = a.id
-            WHERE t.account_id = ?
+            WHERE t.account_id = ? AND t.is_shown = TRUE
             ORDER BY t.created_at DESC`,
             [account.id]
         );
@@ -490,12 +526,13 @@ russianCommands.hears('/выписка', async (ctx) => {
             const balanceCell = row.getCell('balance');
 
             [amountCell, balanceCell].forEach(cell => {
-                const value = parseFloat(cell.value);
+                // Format the value using nFormat before setting it
+                cell.value = nFormat(cell.value);
                 cell.numFmt = '#,##0.00';
                 cell.font = {
                     name: 'Arial',
                     size: 11,
-                    color: { argb: value < 0 ? 'FF0000' : '008000' }
+                    color: { argb: parseFloat(cell.value.replace(/,/g, '')) < 0 ? 'FF0000' : '008000' }
                 };
             });
 
@@ -530,7 +567,8 @@ russianCommands.hears('/выписка', async (ctx) => {
             ),
             {
                 caption: `<blockquote>#${account.name}</blockquote>\nВыписка по счету`,
-                parse_mode: 'HTML'
+                parse_mode: 'HTML', 
+                reply_markup: dropKeyboard
             }
         );
 

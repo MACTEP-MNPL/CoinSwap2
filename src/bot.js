@@ -18,10 +18,15 @@ const {TG_BOT_TOKEN} = process.env
 export const {PROXY_HOST, PROXY_PORT, PROXY_USERNAME, PROXY_PASSWORD} = process.env
 
 export const db = await pool.getConnection()
-
 export const api = new createApi()
-await api.updateFast()
-await api.updateSlow()
+
+try {
+    await api.updateFast()
+    await api.updateSlow()
+    
+} catch (error) {
+    console.error('Error updating API:', error)
+}
 
 export const bot = new Bot(TG_BOT_TOKEN)
 

@@ -57,6 +57,7 @@ totalHears.hears('🧾 Сводка', async (ctx) => {
         // Prepare columns - first column for account names, then one for each currency
         const columns = [
             { header: 'Счет', key: 'account', width: 20 },
+            { header: 'ID', key: 'accountId', width: 10 },
             ...currencies.map(c => ({
                 header: c.currency,
                 key: c.currency,
@@ -88,7 +89,8 @@ totalHears.hears('🧾 Сводка', async (ctx) => {
         accounts.forEach((account, index) => {
             // Prepare row data
             const rowData = {
-                account: account.name
+                account: account.name,
+                accountId: account.id
             };
 
             // Fill in balances for each currency
@@ -118,6 +120,14 @@ totalHears.hears('🧾 Сводка', async (ctx) => {
                         size: 11,
                         bold: true
                     };
+                } else if (colNumber === 2) {
+                    // Account ID styling - plain text without number formatting
+                    cell.font = {
+                        name: 'Arial',
+                        size: 11
+                    };
+                    cell.numFmt = '@'; // Text format
+                    cell.alignment = { horizontal: 'center' };
                 } else {
                     // Balance styling
                     if (cell.value === '❌') {

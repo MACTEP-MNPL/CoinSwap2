@@ -9,7 +9,6 @@ export const ABCEXBuyDollar = async () => {
     });
     
     if (!response.ok) {
-      throw new Error(`ABCEX API error: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
@@ -19,7 +18,6 @@ export const ABCEXBuyDollar = async () => {
     return data.askPrice;
   } catch (error) {
     console.error('Error fetching ABCEX buy dollar rate:', error);
-    throw error;
   }
 }
 
@@ -34,7 +32,6 @@ export const ABCEXSellDollar = async () => {
     });
     
     if (!response.ok) {
-      throw new Error(`ABCEX API error: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
@@ -44,6 +41,5 @@ export const ABCEXSellDollar = async () => {
     return data.bidPrice;
   } catch (error) {
     console.error('Error fetching ABCEX sell dollar rate:', error);
-    throw error;
   }
 }

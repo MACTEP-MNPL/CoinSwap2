@@ -11,8 +11,8 @@ inlineMath.on('inline_query', async (ctx) => {
         
         // Replace keywords with their values
         query = query
-            .replace(/гара/g, api.GarantexBuyDollar)
-            .replace(/абц/g, api.ABCEXBuyDollar);
+            .replace(/абц/g, api.ABCEXBuyDollar)
+            .replace(/,/g, '.');
 
         const result = math.evaluate(query);
         const formattedResult = typeof result === 'number' 
