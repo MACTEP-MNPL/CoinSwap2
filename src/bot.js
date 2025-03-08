@@ -130,3 +130,24 @@ bot.start({ allowed_updates: ['chat_member',"message",
   "removed_chat_boost"]
 })
 
+// Add this function to handle reconnection
+const handleDisconnect = async () => {
+  try {
+    await pool.getConnection();
+    console.log('Reconnected to database');
+  } catch (error) {
+    console.error('Error reconnecting to database:', error);
+    setTimeout(handleDisconnect, 2000); // Try to reconnect every 2 seconds
+  }
+};
+
+// Add error handling for database connection
+pool.on('error', async (err) => {
+  console.error('Database error:', err);
+  if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+    handleDisconnect();
+  } else {
+    throw err;
+  }
+});
+
