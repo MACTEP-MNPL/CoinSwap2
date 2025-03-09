@@ -4,6 +4,7 @@ import ExcelJS from 'exceljs';
 import { db } from "../bot.js";
 import { isUser2Lvl } from "../utils/userLvl.js";
 import { isPrivate } from "../utils/isPrivate.js";
+import { nFormat } from "../utils/n.js";
 
 export const totalHears = new Composer()
 
@@ -139,7 +140,7 @@ totalHears.hears('🧾 Сводка', async (ctx) => {
                         cell.alignment = { horizontal: 'center' };
                     } else {
                         const value = parseFloat(cell.value) || 0;
-                        cell.numFmt = '#,##0.00';
+                        cell.value = nFormat(value); // Format the number using nFormat
                         cell.font = {
                             name: 'Arial',
                             size: 11,

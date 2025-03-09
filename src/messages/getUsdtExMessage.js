@@ -8,7 +8,9 @@ export const getUsdtExMessage = async (ctx) => {
         RapiraSellDollar, 
         ABCEXBuyDollar, 
         ABCEXSellDollar, 
-        timestampFast
+        timestampFast,
+        MoscaBuyDollar,
+        MoscaSellDollar
     } = api
 
     const avgBuyRate = (Number(RapiraBuyDollar) + Number(ABCEXBuyDollar)) / 2;
@@ -19,7 +21,11 @@ export const getUsdtExMessage = async (ctx) => {
         `<b>├</b> Купить: <code>${nFormat(RapiraBuyDollar)}</code> ₽\n` +
         `<b>└</b> Продать: <code>${nFormat(RapiraSellDollar)}</code> ₽\n` +
         `\n` +
-        `🔵 <a href="https://m.abcex.io/exchange/USDTRUB">ABCEX</a>\n` +
+        `⚫️ <a href="https://t.me/Mosca67_bot">MOSCA</a>\n` +
+        `├ Купить: <code>${nFormat(MoscaBuyDollar)}</code> ₽\n` +
+        `└ Продать: <code>${nFormat(MoscaSellDollar)}</code> ₽\n` +
+        `\n` +
+        `🔵 <a href="https://abcex.io/">ABCEX</a>\n` +
         `<b>├</b> Купить: <code>${nFormat(ABCEXBuyDollar)}</code> ₽\n` +
         `<b>└</b> Продать: <code>${nFormat(ABCEXSellDollar)}</code> ₽\n` +
         `\n` +
