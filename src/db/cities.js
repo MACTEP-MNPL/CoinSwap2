@@ -72,3 +72,77 @@ export const updateCityMargin = async (cityName, marginType, newValue) => {
     
     return await getCityByName(cityName)
 }
+
+// Get city by ID
+export const getCityById = async (cityId) => {
+    try {
+        const [rows] = await db.execute(
+            'SELECT * FROM cities WHERE id = ?',
+            [cityId]
+        );
+        return rows[0];
+    } catch (error) {
+        console.error("Error getting city by ID:", error);
+        throw error;
+    }
+};
+
+// Update city buy margin
+export const updateCityBuyMargin = async (cityId, changeAmount) => {
+    try {
+        // First get current margin
+        const [currentData] = await db.execute(
+            'SELECT buy_margin FROM cities WHERE id = ?',
+            [cityId]
+        );
+        
+        if (!currentData || currentData.length === 0) {
+            throw new Error("City not found");
+        }
+
+        console.log(currentData)
+        
+        const currentMargin = currentData[0].buy_margin;
+        const newMargin = Math.max(0, Number(currentMargin) + Number(changeAmount)); // Prevent negative margins
+        
+        await db.execute(
+            'UPDATE cities SET buy_margin = ? WHERE id = ?',
+            [newMargin, cityId]
+        );
+        
+        return newMargin;
+    } catch (error) {
+        console.error("Error updating buy margin:", error);
+        throw error;
+    }
+};
+
+// Update city sell margin
+export const updateCitySellMargin = async (cityId, changeAmount) => {
+    try {
+        // First get current margin
+        const [currentData] = await db.execute(
+            'SELECT sell_margin FROM cities WHERE id = ?',
+            [cityId]
+        );
+        
+        if (!currentData || currentData.length === 0) {
+            throw new Error("City not found");
+        }
+
+        console.log(currentData)
+        
+        const currentMargin = currentData[0].sell_margin;
+        const newMargin = Math.max(0, Number(currentMargin) + Number(changeAmount)); // Prevent negative margins
+        
+        await db.execute(
+            'UPDATE cities SET sell_margin = ? WHERE id = ?',
+            [newMargin, cityId]
+        );
+        
+        return newMargin;
+    } catch (error) {
+        console.error("Error updating sell margin:", error);
+        throw error;
+    }
+};

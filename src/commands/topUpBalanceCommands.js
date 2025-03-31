@@ -105,5 +105,9 @@ topUpBalanceCommands.hears(/^\/тез\s+.+/, ctx => handleBalanceUpdate(ctx, 'US
 topUpBalanceCommands.hears(/^\/руб\s+.+/, ctx => handleBalanceUpdate(ctx, 'RUB', '/руб'));
 topUpBalanceCommands.hears(/^\/евр\s+.+/, ctx => handleBalanceUpdate(ctx, 'EUR', '/евр'));
 topUpBalanceCommands.hears(/^\/бакс\s+.+/, ctx => handleBalanceUpdate(ctx, 'USD', '/бакс'));
+topUpBalanceCommands.hears(/^\/Тез\s+.+/, ctx => handleBalanceUpdate(ctx, 'USDT', '/тез'));
+topUpBalanceCommands.hears(/^\/Руб\s+.+/, ctx => handleBalanceUpdate(ctx, 'RUB', '/руб'));
+topUpBalanceCommands.hears(/^\/Евро\s+.+/, ctx => handleBalanceUpdate(ctx, 'EUR', '/евр'));
+topUpBalanceCommands.hears(/^\/Бакс\s+.+/, ctx => handleBalanceUpdate(ctx, 'USD', '/бакс'));
 
 

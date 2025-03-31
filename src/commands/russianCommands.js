@@ -17,7 +17,6 @@ import { InlineKeyboard } from "grammy"
 import { hideTransactionsByCtx } from "../db/transactions.js"
 
 
-
 export const russianCommands = new Composer()   
 
 russianCommands.hears('/код', async (ctx) => {
@@ -30,18 +29,18 @@ russianCommands.hears('/код', async (ctx) => {
 
 russianCommands.hears('/тикет', async (ctx) => {
     await ctx.reply('Чтобы создать тикет, отправь команду в формате: \n' +
-        '<code>/тикет @username @username 1000$</code>', {parse_mode: 'HTML'})
+        '<code>/тикет Название @username @username 1000$</code>', {parse_mode: 'HTML'})
 })
 
-
-russianCommands.hears(/^\/тикет\s+(?:@)?(\S+)\s+(?:@)?(\S+)\s+(\d+(?:[\s,]\d+)*)/, async (ctx) => {
-    const [, sender, receiver, amountStr, sign] = ctx.message.text.split(' ')
+russianCommands.hears(/^\/тикет\s+(\S+)\s+(?:@)?(\S+)\s+(?:@)?(\S+)\s+(\d+(?:[\s,]\d+)*)(?:\s+(.+))?/, async (ctx) => {
+    const [, city, sender, receiver, amountStr, sign] = ctx.message.text.split(' ')
     const code = await getNewCode()
 
     const amount = `<code>${amountStr}</code>` + ' ' + (sign ? sign : '')
 
     await ctx.reply(
-        `<blockquote>#тикет</blockquote> \n` +
+        `<blockquote>#тикет</blockquote>\n` +
+        `${city}\n` +
         `Отдаёт: ${sender}\n` +
         `Принимает: ${receiver}\n` +
         `Сумма: ${amount}\n` +
@@ -49,7 +48,6 @@ russianCommands.hears(/^\/тикет\s+(?:@)?(\S+)\s+(?:@)?(\S+)\s+(\d+(?:[\s,]\
         { parse_mode: 'HTML' }
     );
 });
-
 
 russianCommands.hears('/токен', async (ctx) => {
     const token = await getNewToken()
@@ -99,7 +97,7 @@ russianCommands.hears(/^\/уведоми($|\s)/, async (ctx) => {
     }
 })
 
-russianCommands.hears(/^\/создать($|\s)/, async (ctx) => {
+russianCommands.hears(/^\/создай($|\s)/, async (ctx) => {
 
     if (!await isAdmin(ctx)) {
         return
@@ -108,7 +106,7 @@ russianCommands.hears(/^\/создать($|\s)/, async (ctx) => {
     const name = ctx.message.text.split(' ')[1];
     
     if (!name) {
-        await ctx.reply('Пожалуйста, укажите название аккаунта.\nПример: <code>/создать Основной</code>', {parse_mode: 'HTML'});
+        await ctx.reply('Пожалуйста, укажите название аккаунта.\nПример: <code>/создай Основной</code>', {parse_mode: 'HTML'});
         return;
     }
 
@@ -141,7 +139,7 @@ russianCommands.hears('/б', async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -182,7 +180,7 @@ russianCommands.hears(/^\/б\s+(.+)$/, async (ctx) => {
 
         if (!account) {
             await ctx.reply('❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -217,7 +215,7 @@ russianCommands.hears('/мхл', async (ctx) => {
     const makhachkala = await getMakhachkala()
 
     await ctx.reply(
-        `<b>Махачкала</b> - CoinSwap\n` +
+        `<b>🌄 Махачкала</b> - CoinSwap\n` +
         `<b>├ Купить</b> - ${nCode(makhachkala.buy_price)} ₽\n` +
         `<b>└ Продать</b> - ${nCode(makhachkala.sell_price)} ₽`, {
         parse_mode: "HTML"
@@ -229,7 +227,7 @@ russianCommands.hears('/мск', async (ctx) => {
     const moscow = await getMoscow()
 
     await ctx.reply(
-        `<b>Москва</b> - CoinSwap\n` +
+        `<b>🏙️ Москва</b> - CoinSwap\n` +
         `<b>├ Купить</b> - ${nCode(moscow.buy_price)} ₽\n` +
         `<b>└ Продать</b> - ${nCode(moscow.sell_price)} ₽`, {
         parse_mode: "HTML"
@@ -246,12 +244,18 @@ russianCommands.hears(/^\/добавь\s+(.+)$/, async (ctx) => {
 
         const currency = ctx.match[1].toUpperCase();
 
+        if (!currency) {
+            await ctx.reply('Укажите валюту.\nПример: <code>/add USDT</code>', {parse_mode: 'HTML'});
+            return;
+        }
+
         const account = await getAccountByChat(ctx.chat.id);
         
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -296,7 +300,7 @@ russianCommands.hears(/^\/удали\s+(.+)$/, async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -329,7 +333,7 @@ russianCommands.hears(/^\/удали\s+(.+)$/, async (ctx) => {
     }
 });
 
-russianCommands.hears(/^\/очистить\s+(.+)$/, async (ctx) => {
+russianCommands.hears(/^\/очисти\s+(.+)$/, async (ctx) => {
 
     if (!await isAdmin(ctx)) {
         return;
@@ -342,7 +346,7 @@ russianCommands.hears(/^\/очистить\s+(.+)$/, async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -430,7 +434,7 @@ russianCommands.hears('/выписка', async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;

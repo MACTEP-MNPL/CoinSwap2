@@ -12,6 +12,7 @@ inlineMath.on('inline_query', async (ctx) => {
         // Replace keywords with their values
         query = query
             .replace(/абц/g, api.ABCEXBuyDollar)
+            .replace(/abc/g, api.ABCEXBuyDollar)
             .replace(/,/g, '.');
 
         const result = math.evaluate(query);

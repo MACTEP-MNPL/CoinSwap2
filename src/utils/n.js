@@ -4,7 +4,7 @@ export const n = (number) => {
 
 
 export const n5 = (number) => {
-    return Math.round(number * 20) / 20;
+    return (Math.round(number * 20) / 20).toFixed(2);
 }
 
 

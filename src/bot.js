@@ -10,12 +10,14 @@ import { convers } from './conversations/convers.js'
 import { createApi } from './api/createApi.js'
 import { hydrate } from '@grammyjs/hydrate'
 import { inlineMath } from './hears/mathHears.js'
+import { isAdmin } from './utils/userLvl.js'
+
 
 dotenv.config()
 
-const {TG_BOT_TOKEN} = process.env
+const {TG_BOT_TOKEN, TG_CHANNEL_ID, TG_CHANNEL_USERNAME} = process.env
 
-export const {PROXY_HOST, PROXY_PORT, PROXY_USERNAME, PROXY_PASSWORD} = process.env
+export const {PROXY_HOST, PROXY_PORT, PROXY_USERNAME, PROXY_PASSWORD, TG_OWNER_ID} = process.env
 
 export const db = await pool.getConnection()
 export const api = new createApi()
@@ -42,6 +44,63 @@ bot.use(session({
 }));
 
 bot.use(conversations());
+
+// Define command lists
+const regularCommands = [
+    { command: "start", description: "Запустить бота" },
+    { command: "b", description: "Проверить баланс на аккаунте" },
+];
+
+const adminCommands = [
+    { command: "start", description: "Запустить бота" },
+    { command: "help", description: "Список команд" },
+    { command: "summ", description: "Выписка по аккаунту" },
+    { command: "abc", description: "Курс ABCEX" },
+    { command: "city", description: "Курс в городах" },
+    { command: "admin", description: "Админ панель" },
+    { command: "ticket", description: "Создать тикет" },
+    { command: "code", description: "Создать код" },
+    { command: "token", description: "Создать токен" },
+    { command: "usdt_ex", description: "Курс USDT" },
+    { command: "forex", description: "Курс forex" },
+    { command: "city", description: "Курс в городах" },
+];
+
+// Function to set commands based on user level
+async function setUserCommands(ctx, isAdmin) {
+    try {
+        if (isAdmin) {
+            // Set admin commands for this specific user
+            await ctx.api.setMyCommands(adminCommands, {
+                scope: { type: "chat", chat_id: ctx.chat.id }
+            });
+        } else {
+            // Set regular commands for this specific user
+            await ctx.api.setMyCommands(regularCommands, {
+                scope: { type: "chat", chat_id: ctx.chat.id }
+            });
+        }
+    } catch (error) {
+        console.error('Error setting commands:', error);
+    }
+}
+
+bot.use(async (ctx, next) => {
+    try {
+        console.log(ctx.chat?.type)
+        if (ctx.chat?.type !== 'private') {
+            return await next();
+        }
+        
+            const adminCheck = await isAdmin(ctx);
+            await setUserCommands(ctx, adminCheck);
+
+        return await next();
+    } catch (error) {
+        console.error('Middleware error:', error);
+        return await next();
+    }
+});
 
 bot.use(async (ctx, next) => {
    try {
@@ -85,6 +144,46 @@ bot.use(async (ctx, next) => {
 }
 })
 
+bot.use(async (ctx, next) => {
+    try {
+
+      if (ctx.chat?.type !== 'private') {
+        return await next();
+    }
+        const channelId = TG_CHANNEL_ID;
+        const userId = ctx.from?.id;
+
+        if (!userId) {
+            return await next();
+        }
+
+        const member = await ctx.api.getChatMember(channelId, userId);
+        
+        // List of allowed status types for channel members
+        const allowedStatus = ['creator', 'administrator', 'member'];
+        
+        if (!allowedStatus.includes(member.status)) {
+            await ctx.reply(
+                `👋 Для использования бота необходимо подписаться на наш телеграм канал: @${TG_CHANNEL_USERNAME}\n\n`,
+                {
+                    parse_mode: 'HTML',
+                    reply_markup: {
+                        inline_keyboard: [[
+                            { text: '✅ Ссылка на канал', url: `https://t.me/${TG_CHANNEL_USERNAME}` }
+                        ]]
+                    }
+                }
+            );
+            return;
+        }
+
+        return await next();
+    } catch (error) {
+        console.error('Subscription check error:', error);
+        return await next();
+    }
+});
+
 bot.use(convers)
 
 bot.use(menus)
@@ -94,6 +193,36 @@ bot.use(commands)
 bot.use(hears)
 
 bot.use(inlineMath)
+
+// Add chat_member update handler for join notifications
+bot.on("chat_member", async (ctx) => {
+    try {
+        const update = ctx.update.chat_member;
+        
+        // Check if this is for our channel
+        if (update.chat.username !== TG_CHANNEL_USERNAME) {
+            return;
+        }
+
+        // Check if this is a new join
+        if (update.old_chat_member.status !== 'member' && 
+            update.new_chat_member.status === 'member') {
+            
+            // Send welcome message to the user
+            await bot.api.sendMessage(
+                update.new_chat_member.user.id,
+                `🤝 Спасибо за подписку на канал @${TG_CHANNEL_USERNAME}!\n\n` +
+                `Теперь вы можете использовать все функции бота.\n` +
+                `Нажмите /start чтобы начать.`,
+                {
+                    parse_mode: 'HTML'
+                }
+            );
+        }
+    } catch (error) {
+        console.error('Error handling chat member update:', error);
+    }
+});
 
 bot.catch((err) => {
     const ctx = err.ctx;
@@ -108,26 +237,29 @@ bot.catch((err) => {
     }
 });
 
-
-bot.start({ allowed_updates: ['chat_member',"message",
-  "edited_message",
-  "channel_post",
-  "edited_channel_post",
-  "business_connection",
-  "business_message",
-  "edited_business_message",
-  "deleted_business_messages",
-  "inline_query",
-  "chosen_inline_result",
-  "callback_query",
-  "shipping_query",
-  "pre_checkout_query",
-  "poll",
-  "poll_answer",
-  "my_chat_member",
-  "chat_join_request",
-  "chat_boost",
-  "removed_chat_boost"]
+bot.start({
+    allowed_updates: [
+        "message",
+        "chat_member",  // This is important for join notifications
+        "edited_message",
+        "channel_post",
+        "edited_channel_post",
+        "business_connection",
+        "business_message",
+        "edited_business_message",
+        "deleted_business_messages",
+        "inline_query",
+        "chosen_inline_result",
+        "callback_query",
+        "shipping_query",
+        "pre_checkout_query",
+        "poll",
+        "poll_answer",
+        "my_chat_member",
+        "chat_join_request",
+        "chat_boost",
+        "removed_chat_boost"
+    ]
 })
 
 // Add this function to handle reconnection
@@ -150,6 +282,11 @@ pool.on('error', async (err) => {
     throw err;
   }
 });
+
+setInterval(() => {
+    const used = process.memoryUsage();
+    console.log(`Memory usage: ${Math.round(used.heapUsed / 1024 / 1024)}MB`);
+}, 300000); // Log every 5 minutes
 
 
 

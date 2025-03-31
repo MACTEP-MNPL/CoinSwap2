@@ -27,21 +27,17 @@ export class createApi {
         this.MoscaBuyDollar = 0
         this.MoscaSellDollar = 0
         
-        // Run at 0 seconds of every minute
-        cron.schedule('* * * * *', async () => {
-            console.log("api every update " + new Date().toLocaleString())
+        // Run updateFast every 30 seconds
+        cron.schedule('*/20 * * * * *', async () => {
+            console.log("api fast update " + new Date().toLocaleString())
             await this.updateFast()
-            await this.updateSlow()
-
-            // Run at 30 seconds of every minute
-            setTimeout(() => {
-                cron.schedule('* * * * *', async () => {
-                    console.log("api fast update " + this.timestampFast)
-                    await this.updateFast()
-                })
-            }, 30000)
         })
-    
+        
+        // Run updateSlow every minute
+        cron.schedule('* * * * *', async () => {
+            console.log("api slow update " + new Date().toLocaleString())
+            await this.updateSlow()
+        })
     }
         
     async updateFast() {
@@ -52,8 +48,8 @@ export class createApi {
             this.ABCEXBuyDollar = nFormat(await ABCEXBuyDollar()) // хз
             this.ABCEXSellDollar = nFormat(await ABCEXSellDollar())
 
-            this.MoscaBuyDollar = await getMoscaBuyDollar()
-            this.MoscaSellDollar = await getMoscaSellDollar()
+            //this.MoscaBuyDollar = await getMoscaBuyDollar()
+            //this.MoscaSellDollar = await getMoscaSellDollar()
 
             const date = new Date()
             

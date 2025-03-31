@@ -106,10 +106,12 @@ englishCommands.command('add', async (ctx) => {
 
     try {
         const currency = ctx.message.text.split(' ')[1]?.toUpperCase();
+        
         if (!currency) {
             await ctx.reply('Укажите валюту.\nПример: <code>/add USDT</code>', {parse_mode: 'HTML'});
             return;
         }
+
         const account = await getAccountByChat(ctx.chat.id);
         
         if (!account) {
@@ -122,17 +124,17 @@ englishCommands.command('add', async (ctx) => {
         }
 
         await createNewBalance(account.id, currency);
-
-        ctx.session.undos[ctx.message.message_id] = {
-            currency: currency,
-            account: account
-        }
         
         await ctx.reply(
             `<blockquote>#${account.name}</blockquote>\n\n` +
             `<i>"Счет ${currency} добавлен"</i>`,
             {parse_mode: 'HTML', reply_markup: undoCreatingNewBalanceMenu}
         );
+
+        const balance = await getBalanceByAccountIdAndCurrency(account.id, currency);
+
+        await createNewTransaction(balance[0].id, ctx.from.id, account.id, 0,`СОЗДАНИЕ СЧЕТА`, 0, ctx.message.message_id, currency)
+
     } catch (error) {
         if (error.message === 'CURRENCY_EXISTS') {
             await ctx.reply(
@@ -175,12 +177,7 @@ englishCommands.command('remove', async (ctx) => {
 
         await deleteBalanceByName(account.id, currency);
 
-
-        ctx.session.undos[ctx.message.message_id] = {
-            currency: currency,
-            account: account,
-            balance: balance[0].balance
-        }
+        await createNewTransaction(balance[0].id, ctx.from.id, account.id, -balance[0].balance,`УДАЛЕНИЕ СЧЕТА`, 0, ctx.message.message_id, currency)
         
         await ctx.reply(
             `<blockquote>#${account.name}</blockquote>\n\n` +
@@ -258,7 +255,7 @@ englishCommands.command('clear', async (ctx) => {
 englishCommands.command('mcx', async (ctx) => {
     const makhachkala = await getMakhachkala()
     await ctx.reply(
-        `<b>Махачкала</b> - CoinSwap\n` +
+        `<b>🌄 Махачкала</b> - CoinSwap\n` +
         `<b>├ Покупка</b> - ${nCode(makhachkala.buy_price)} ₽\n` +
         `<b>└ Продажа</b> - ${nCode(makhachkala.sell_price)} ₽`, {
         parse_mode: "HTML"
@@ -269,7 +266,7 @@ englishCommands.command('mcx', async (ctx) => {
 englishCommands.command('msc', async (ctx) => {  
     const moscow = await getMoscow()
     await ctx.reply(
-        `<b>Москва</b> - CoinSwap\n` +
+        `<b>🏙️ Москва</b> - CoinSwap\n` +
         `<b>├ Покупка</b> - ${nCode(moscow.buy_price)} ₽\n` +
         `<b>└ Продажа</b> - ${nCode(moscow.sell_price)} ₽`, {
         parse_mode: "HTML"
@@ -381,6 +378,11 @@ englishCommands.command('ticket', async (ctx) => {
 })
 
 englishCommands.command('help', async (ctx) => {
+
+    if (!await isAdmin(ctx)) {
+        return;
+    }
+
   await ctx.reply(
     `<code>/b</code> - баланс текущего счёта\n` +
     `<code>/code</code> - создать код заявки \n` +
