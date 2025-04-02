@@ -81,7 +81,7 @@ async function setUserCommands(ctx, isAdmin) {
             });
         }
     } catch (error) {
-        console.error('Error setting commands:', error);
+        console.error('Error setuting commands:', error);
     }
 }
 

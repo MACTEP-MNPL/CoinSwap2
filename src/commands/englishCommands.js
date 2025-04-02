@@ -66,7 +66,6 @@ englishCommands.command('messages', async (ctx) => {
     }
 })
 
-// /create command (copy of /создать)
 englishCommands.command('create', async (ctx) => {
 
     if (!await isAdmin(ctx)) {
@@ -167,7 +166,7 @@ englishCommands.command('remove', async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -216,7 +215,7 @@ englishCommands.command('clear', async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -281,7 +280,7 @@ englishCommands.command('b', async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;
@@ -434,7 +433,7 @@ englishCommands.command('summ', async (ctx) => {
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
-                'Создайте его командой: <code>/создать Название</code>', 
+                'Создайте его командой: <code>/создай Название</code>', 
                 {parse_mode: 'HTML'}
             );
             return;

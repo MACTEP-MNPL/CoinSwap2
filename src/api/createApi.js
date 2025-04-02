@@ -48,8 +48,8 @@ export class createApi {
             this.ABCEXBuyDollar = nFormat(await ABCEXBuyDollar()) // хз
             this.ABCEXSellDollar = nFormat(await ABCEXSellDollar())
 
-            //this.MoscaBuyDollar = await getMoscaBuyDollar()
-            //this.MoscaSellDollar = await getMoscaSellDollar()
+            this.MoscaBuyDollar = await getMoscaBuyDollar()
+            this.MoscaSellDollar = await getMoscaSellDollar()
 
             const date = new Date()
             

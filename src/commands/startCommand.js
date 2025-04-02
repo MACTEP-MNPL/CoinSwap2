@@ -9,9 +9,11 @@ const updateKeyboard = new InlineKeyboard()
 export const startCommand = new Composer()
 
 startCommand.command("start", async (ctx) => {
-    if (!isPrivate(ctx)) return;
+
+    if (isPrivate(ctx)) return;
 
     const message = await getUsdtExMessage(ctx);
+
     await ctx.reply(message, {
         parse_mode: 'HTML', 
         disable_web_page_preview: true,
