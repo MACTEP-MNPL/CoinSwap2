@@ -2,16 +2,37 @@ import { db } from "../bot.js"
 import { ABCEXBuyDollar } from "../api/feauters/ABCEX.js"
 import { ABCEXSellDollar } from "../api/feauters/ABCEX.js"
 import { nFormat } from "../utils/n.js"
+import { api } from "../bot.js"
 
 export const getMoscow = async () => {
     const [result] = await db.execute(
         'SELECT * FROM cities WHERE name = "Москва"'
     )
+
+    const {
+        RapiraBuyDollar, 
+        RapiraSellDollar, 
+        ABCEXBuyDollar, 
+        ABCEXSellDollar, 
+        MoscaBuyDollar,
+        MoscaSellDollar
+    } = api
+
+    const validBuyRates = [RapiraBuyDollar, ABCEXBuyDollar, MoscaBuyDollar]
+    .map(Number)
+    .filter(rate => !isNaN(rate));
+
+    const validSellRates = [RapiraSellDollar, ABCEXSellDollar, MoscaSellDollar]
+    .map(Number)
+    .filter(rate => !isNaN(rate));
+
+    const avgBuyRate = validBuyRates.length ? validBuyRates.reduce((sum, rate) => sum + rate, 0) / validBuyRates.length : 0;
+    const avgSellRate = validSellRates.length ? validSellRates.reduce((sum, rate) => sum + rate, 0) / validSellRates.length : 0;
     
     const city = {
         ...result[0],
-        buy_price: nFormat(Number(await ABCEXBuyDollar()) + Number(result[0].buy_margin)),
-        sell_price: nFormat(Number(await ABCEXSellDollar()) - Number(result[0].sell_margin))
+        buy_price: nFormat(Number(avgBuyRate) + Number(result[0].buy_margin)),
+        sell_price: nFormat(Number(avgSellRate) - Number(result[0].sell_margin))
     }
 
     return city
@@ -22,10 +43,30 @@ export const getMakhachkala = async () => {
         'SELECT * FROM cities WHERE name = "Махачкала"'
     )
 
+    const {
+        RapiraBuyDollar, 
+        RapiraSellDollar, 
+        ABCEXBuyDollar, 
+        ABCEXSellDollar, 
+        MoscaBuyDollar,
+        MoscaSellDollar
+    } = api
+
+    const validBuyRates = [RapiraBuyDollar, ABCEXBuyDollar, MoscaBuyDollar]
+    .map(Number)
+    .filter(rate => !isNaN(rate));
+
+    const validSellRates = [RapiraSellDollar, ABCEXSellDollar, MoscaSellDollar]
+    .map(Number)
+    .filter(rate => !isNaN(rate));
+
+    const avgBuyRate = validBuyRates.length ? validBuyRates.reduce((sum, rate) => sum + rate, 0) / validBuyRates.length : 0;
+    const avgSellRate = validSellRates.length ? validSellRates.reduce((sum, rate) => sum + rate, 0) / validSellRates.length : 0;
+
     const city = {
         ...result[0],
-        buy_price: nFormat(Number(await ABCEXBuyDollar()) + Number(result[0].buy_margin)),
-        sell_price: nFormat(Number(await ABCEXSellDollar()) - Number(result[0].sell_margin))
+        buy_price: nFormat(Number(avgBuyRate) + Number(result[0].buy_margin)),
+        sell_price: nFormat(Number(avgSellRate) - Number(result[0].sell_margin))
     }
 
     return city

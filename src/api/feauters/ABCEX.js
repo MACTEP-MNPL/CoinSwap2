@@ -1,5 +1,7 @@
 export const ABCEXBuyDollar = async () => {
   try {
+
+    //https://gateway.abcex.io/api/v1/markets/price?marketId=USDTRUB
     const response = await fetch('https://gateway.abcex.io/api/v1/exchange/client/market-data/order-book/depth?marketId=USDTRUB', {
       method: 'GET',
       headers: {

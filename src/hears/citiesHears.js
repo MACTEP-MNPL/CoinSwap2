@@ -11,6 +11,7 @@ const updateKeyboard = new InlineKeyboard()
 export const citiesHears = new Composer()
 
 const getCitiesMessage = async () => {
+    
     const moscow = await getMoscow()
     const makhachkala = await getMakhachkala()
 
@@ -20,7 +21,7 @@ const getCitiesMessage = async () => {
            `🌄 <b>Махачкала</b> - CoinSwap\n` +
            `<b>├ Купить</b> - <code>${n5(makhachkala.buy_price)}</code> ₽\n` +
            `<b>└ Продать</b> - <code>${n5(makhachkala.sell_price)}</code> ₽`;
-}
+    }
 
 citiesHears.hears("🏙 Города", async (ctx) => {
     if (!isPrivate(ctx)) return;

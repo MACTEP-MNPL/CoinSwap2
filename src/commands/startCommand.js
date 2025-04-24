@@ -10,7 +10,7 @@ export const startCommand = new Composer()
 
 startCommand.command("start", async (ctx) => {
 
-    if (isPrivate(ctx)) return;
+    if (!isPrivate(ctx)) return;
 
     const message = await getUsdtExMessage(ctx);
 
