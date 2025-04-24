@@ -424,9 +424,6 @@ russianCommands.callbackQuery('finalDrop_summary', async (ctx) => {
 })
 
 russianCommands.hears('/выписка', async (ctx) => {
-    if (!await isAdmin(ctx)) {
-        return;
-    }
 
     try {
         const account = await getAccountByChat(ctx.chat.id);

@@ -20,7 +20,7 @@ export const nCode5 = (number) => {
 
 export const nFormat = (number) => {
 
-    if(number === undefined || number === null || isNaN(number) || number === Infinity || number === "NaN" || number === "Infinity" || number === "undefined" || number === "null" || number === '❗️') return "❗️"
+    if(number === undefined || number === null || isNaN(number) || number === Infinity || number === "NaN" || number === "Infinity" || number === "undefined" || number === "null" || number === '-') return "-"
 
     // Convert to fixed 2 decimal places first
     const fixed = Number(number).toFixed(2);
@@ -34,7 +34,7 @@ export const nFormat = (number) => {
 
 export const nForm = (number) => {
 
-    if(number === undefined || number === null || isNaN(number) || number === Infinity || number === "NaN" || number === "Infinity" || number === "undefined" || number === "null" || number === '❗️') return "❗️"
+    if(number === undefined || number === null || isNaN(number) || number === Infinity || number === "NaN" || number === "Infinity" || number === "undefined" || number === "null" || number === '-') return "-"
     
     const fixed = Number(number).toFixed(0);
     

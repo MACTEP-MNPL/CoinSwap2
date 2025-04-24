@@ -13,8 +13,16 @@ export const getUsdtExMessage = async (ctx) => {
         MoscaSellDollar
     } = api
 
-    const avgBuyRate = (Number(RapiraBuyDollar) + Number(ABCEXBuyDollar)) / 2;
-    const avgSellRate = (Number(RapiraSellDollar) + Number(ABCEXSellDollar)) / 2;
+    const validBuyRates = [RapiraBuyDollar, ABCEXBuyDollar, MoscaBuyDollar]
+        .map(Number)
+        .filter(rate => !isNaN(rate));
+    
+    const validSellRates = [RapiraSellDollar, ABCEXSellDollar, MoscaSellDollar]
+        .map(Number)
+        .filter(rate => !isNaN(rate));
+    
+    const avgBuyRate = validBuyRates.length ? validBuyRates.reduce((sum, rate) => sum + rate, 0) / validBuyRates.length : 0;
+    const avgSellRate = validSellRates.length ? validSellRates.reduce((sum, rate) => sum + rate, 0) / validSellRates.length : 0;
 
     return (
         `⚪️ <a href="https://rapira.net/exchange/USDT_RUB">Rapira</a>\n` +

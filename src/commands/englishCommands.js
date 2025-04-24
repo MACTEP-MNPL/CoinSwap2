@@ -423,9 +423,6 @@ englishCommands.command('reset', async (ctx) => {
 const dropKeyboard = new InlineKeyboard().text('🗑 Сверить выписку', 'drop_summary')
 
 englishCommands.command('summ', async (ctx) => {
-    if (!await isAdmin(ctx)) {
-        return;
-    }
 
     try {
         const account = await getAccountByChat(ctx.chat.id);
