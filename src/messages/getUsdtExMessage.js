@@ -1,31 +1,26 @@
 import { api } from "../bot.js"
 import { nFormat } from "../utils/n.js"
 
+
 export const getUsdtExMessage = async (ctx) => {
 
     const {
         RapiraBuyDollar, 
-        RapiraSellDollar, 
-        ABCEXBuyDollar, 
+        RapiraSellDollar,         
         ABCEXSellDollar, 
-        timestampFast,
+        ABCEXBuyDollar,
         MoscaBuyDollar,
-        MoscaSellDollar
+        MoscaSellDollar,
+        GrinexBuyDollar,
+        GrinexSellDollar,
+        timestampFast,
+        AVGDollarBuy,
+        AVGDollarSell
     } = api
 
-    const validBuyRates = [RapiraBuyDollar, ABCEXBuyDollar, MoscaBuyDollar]
-        .map(Number)
-        .filter(rate => !isNaN(rate));
-    
-    const validSellRates = [RapiraSellDollar, ABCEXSellDollar, MoscaSellDollar]
-        .map(Number)
-        .filter(rate => !isNaN(rate));
-    
-    const avgBuyRate = validBuyRates.length ? validBuyRates.reduce((sum, rate) => sum + rate, 0) / validBuyRates.length : 0;
-    const avgSellRate = validSellRates.length ? validSellRates.reduce((sum, rate) => sum + rate, 0) / validSellRates.length : 0;
 
     return (
-        `⚪️ <a href="https://rapira.net/exchange/USDT_RUB">Rapira</a>\n` +
+        `⚪️ <a href="https://rapira.net/?ref=5CHC">Rapira</a>\n` +
         `<b>├</b> Купить: <code>${nFormat(RapiraBuyDollar)}</code> ₽\n` +
         `<b>└</b> Продать: <code>${nFormat(RapiraSellDollar)}</code> ₽\n` +
         `\n` +
@@ -33,13 +28,17 @@ export const getUsdtExMessage = async (ctx) => {
         `├ Купить: <code>${nFormat(MoscaBuyDollar)}</code> ₽\n` +
         `└ Продать: <code>${nFormat(MoscaSellDollar)}</code> ₽\n` +
         `\n` +
+        `🟠 <a href="https://grinex.io/invite/BNSebf">Grinex</a>\n` +
+        `<b>├</b> Купить: <code>${nFormat(GrinexBuyDollar)}</code> ₽\n` +
+        `<b>└</b> Продать: <code>${nFormat(GrinexSellDollar)}</code> ₽\n` +
+        `\n` +
         `🔵 <a href="https://abcex.io/">ABCEX</a>\n` +
         `<b>├</b> Купить: <code>${nFormat(ABCEXBuyDollar)}</code> ₽\n` +
         `<b>└</b> Продать: <code>${nFormat(ABCEXSellDollar)}</code> ₽\n` +
         `\n` +
         `*️⃣ <b>Средний курс</b>\n` +
-        `<b>├</b> Купить: <code>${nFormat(avgBuyRate)}</code> ₽\n` +
-        `<b>└</b> Продать: <code>${nFormat(avgSellRate)}</code> ₽\n` +
+        `<b>├</b> Купить: <code>${nFormat(AVGDollarBuy)}</code> ₽\n` +
+        `<b>└</b> Продать: <code>${nFormat(AVGDollarSell)}</code> ₽\n` +
         `\n` +
         `${timestampFast}`
     )   

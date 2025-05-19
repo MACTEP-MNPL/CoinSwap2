@@ -39,12 +39,11 @@ russianCommands.hears(/^\/тикет\s+(\S+)\s+(?:@)?(\S+)\s+(?:@)?(\S+)\s+(\d+(
     const amount = `<code>${amountStr}</code>` + ' ' + (sign ? sign : '')
 
     await ctx.reply(
-        `<blockquote>#тикет</blockquote>\n` +
-        `${city}\n` +
-        `Отдаёт: ${sender}\n` +
-        `Принимает: ${receiver}\n` +
-        `Сумма: ${amount}\n` +
-        `Код: <code>${code}</code>`,
+        `📍 ${city}\n` +
+        `➡️ Отдаёт: ${sender}\n` +
+        `⬅️ Принимает: ${receiver}\n` +
+        `💰 Сумма: ${amount}\n` +
+        `🔐 Код: <code>${code}</code>`,
         { parse_mode: 'HTML' }
     );
 });
@@ -595,4 +594,44 @@ russianCommands.hears('/сброс', async (ctx) => {
     await deleteAccountByChat(ctx.chat.id);
 
     await ctx.reply(`❌ Аккаунт <code>#${account.name}</code> в этом чате успешно удален`, {parse_mode: 'HTML'});
+})
+
+russianCommands.hears(/^\/отправь($|\s)/, async (ctx) => {
+    if (!await isUser2Lvl(ctx)) {
+        return
+    }
+
+    const text = ctx.message.text.slice(9).trim()
+
+    if (!text) {
+        await ctx.reply('Укажите текст сообщения после команды.\nПример: /отправь Важное сообщение')
+        return
+    }
+
+    try {
+        const [users] = await db.execute('SELECT id FROM users')
+        
+        let successCount = 0
+        let failCount = 0
+
+        for (const {id} of users) {
+            try {
+                await ctx.api.sendMessage(id, text, { parse_mode: 'HTML' })
+                successCount++
+            } catch (error) {
+                failCount++
+            }
+        }
+
+        await ctx.reply(
+            `✅ Сообщение отправлено пользователям:\n` +
+            `├ Успешно: ${successCount}\n` +
+            `└ Не доставлено: ${failCount}`,
+            { parse_mode: 'HTML' }
+        )
+
+    } catch (error) {
+        console.error('Error sending messages to users:', error)
+        await ctx.reply('❌ Произошла ошибка при отправке сообщений')
+    }
 })

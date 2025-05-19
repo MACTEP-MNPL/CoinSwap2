@@ -11,8 +11,14 @@ inlineMath.on('inline_query', async (ctx) => {
         
         // Replace keywords with their values
         query = query
+            .replace(/тез/g, api.AVGDollarBuy)
+            .replace(/цб/g, api.CBRFDollar)
+            .replace(/профинанс/g, api.ProFinanceDollar)
+            .replace(/инвест/g, api.InvestingDollar)
+            .replace(/рапира/g, api.RapiraBuyDollar)
+            .replace(/моска/g, api.MoscaBuyDollar)
+            .replace(/гринекс/g, api.GrinexBuyDollar)
             .replace(/абц/g, api.ABCEXBuyDollar)
-            .replace(/abc/g, api.ABCEXBuyDollar)
             .replace(/,/g, '.');
 
         const result = math.evaluate(query);

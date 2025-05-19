@@ -13,6 +13,7 @@ import ExcelJS from 'exceljs'
 import { getABCEXCommandMessage } from "../messages/getABCEXCommandMessage.js"
 import { InputFile } from "grammy"
 import { InlineKeyboard } from "grammy"
+import { isPrivate } from "../utils/isPrivate.js"
 
 
 export const englishCommands = new Composer()
@@ -39,7 +40,6 @@ englishCommands.command('messages', async (ctx) => {
 
     try {
         const [chatIds] = await db.execute('SELECT chat_id FROM accounts')
-        console.log(chatIds)
         
         let successCount = 0
         let failCount = 0
@@ -274,6 +274,11 @@ englishCommands.command('msc', async (ctx) => {
 
 englishCommands.command('b', async (ctx) => {
     try {
+
+        if(isPrivate(ctx)) {
+            return
+        }
+
         const account = await getAccountByChat(ctx.chat.id);
         const requestedCurrency = ctx.message.text.split(' ')[1]?.toUpperCase();
         
@@ -361,13 +366,13 @@ englishCommands.command('ticket', async (ctx) => {
     const amount = `<code>${amountStr}</code>` + ' ' + (sign ? sign : '')
 
     await ctx.reply(
-        `<blockquote>#тикет</blockquote> \n` +
-        `Отдаёт: ${sender}\n` +
-        `Принимает: ${receiver}\n` +
-            `Сумма: ${amount}\n` +
-            `Код: <code>${code}</code>`,
-            { parse_mode: 'HTML' }
-        )
+        `📍 ${ctx.message.text.split(' ')[1]}\n` +
+        `➡️ Отдаёт: @${sender}\n` +
+        `⬅️ Принимает: @${receiver}\n` +
+        `💰 Сумма: ${amount}\n` +
+        `🔐 Код: <code>${code}</code>`,
+        { parse_mode: 'HTML' }
+    )
 
     } catch (error) {
         console.error('Error in /ticket command:', error);
@@ -582,6 +587,46 @@ englishCommands.command('summ', async (ctx) => {
 englishCommands.command('abc', async (ctx) => {
     const message = await getABCEXCommandMessage()
     await ctx.reply(message, {parse_mode: 'HTML', disable_web_page_preview: true})
+})
+
+englishCommands.command('send_users', async (ctx) => {
+    if (!await isUser2Lvl(ctx)) {
+        return
+    }
+
+    const text = ctx.message.text.slice(11).trim()
+
+    if (!text) {
+        await ctx.reply('Укажите текст сообщения после команды.\nПример: /send_users Important message')
+        return
+    }
+
+    try {
+        const [users] = await db.execute('SELECT id FROM users')
+        
+        let successCount = 0
+        let failCount = 0
+
+        for (const {id} of users) {
+            try {
+                await ctx.api.sendMessage(id, text, { parse_mode: 'HTML' })
+                successCount++
+            } catch (error) {
+                failCount++
+            }
+        }
+
+        await ctx.reply(
+            `✅ Сообщение отправлено пользователям:\n` +
+            `├ Успешно: ${successCount}\n` +
+            `└ Не доставлено: ${failCount}`,
+            { parse_mode: 'HTML' }
+        )
+
+    } catch (error) {
+        console.error('Error sending messages to users:', error)
+        await ctx.reply('❌ Произошла ошибка при отправке сообщений')
+    }
 })
 
 

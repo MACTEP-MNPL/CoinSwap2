@@ -1,14 +1,23 @@
 import { api } from "../bot.js"
+import { nFormat } from "../utils/n.js"
 
 export const getXERatesMessage = async (ctx) => {
-    const { EURtoUSD, USDtoEUR, USDtoGBP, USDtoCNY, USDtoKRW } = api
+    const { XEDollar, XEEUro, XEGBP, XECNY, XEKRW, XETimestamp } = api
 
     return (
-        `💱 Курсы валют (XE.com)\n\n` +
-        `1 EUR = <code>${EURtoUSD}</code> USD\n\n` +
-        `1 USD = <code>${USDtoEUR}</code> EUR\n\n` +
-        `1 USD = <code>${USDtoGBP}</code> GBP\n\n` +
-        `1 USD = <code>${USDtoCNY}</code> CNY\n\n` +
-        `1 USD = <code>${USDtoKRW}</code> KRW\n`
+        `<blockquote>1 EUR = <code>${nFormat(XEDollar)}</code> USD\n\n` +
+        `1 USD = <code>${nFormat(XEEUro)}</code> EUR\n\n` +
+        `1 USD = <code>${nFormat(XEGBP)}</code> GBP\n\n` +
+        `1 USD = <code>${nFormat(XECNY)}</code> CNY\n\n` +
+        `1 USD = <code>${nFormat(XEKRW)}</code> KRW\n</blockquote>` +
+        `\n${new Date(XETimestamp).toLocaleString('ru-RU', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: 'UTC'
+        }).replace(',', ' |')} <a href="https://xe.com">xe.com</a>`
     )
 } 

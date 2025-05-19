@@ -9,25 +9,9 @@ export const getMoscow = async () => {
         'SELECT * FROM cities WHERE name = "Москва"'
     )
 
-    const {
-        RapiraBuyDollar, 
-        RapiraSellDollar, 
-        ABCEXBuyDollar, 
-        ABCEXSellDollar, 
-        MoscaBuyDollar,
-        MoscaSellDollar
-    } = api
+    const avgBuyRate = api.AVGDollarBuy
+    const avgSellRate = api.AVGDollarSell
 
-    const validBuyRates = [RapiraBuyDollar, ABCEXBuyDollar, MoscaBuyDollar]
-    .map(Number)
-    .filter(rate => !isNaN(rate));
-
-    const validSellRates = [RapiraSellDollar, ABCEXSellDollar, MoscaSellDollar]
-    .map(Number)
-    .filter(rate => !isNaN(rate));
-
-    const avgBuyRate = validBuyRates.length ? validBuyRates.reduce((sum, rate) => sum + rate, 0) / validBuyRates.length : 0;
-    const avgSellRate = validSellRates.length ? validSellRates.reduce((sum, rate) => sum + rate, 0) / validSellRates.length : 0;
     
     const city = {
         ...result[0],
@@ -43,25 +27,8 @@ export const getMakhachkala = async () => {
         'SELECT * FROM cities WHERE name = "Махачкала"'
     )
 
-    const {
-        RapiraBuyDollar, 
-        RapiraSellDollar, 
-        ABCEXBuyDollar, 
-        ABCEXSellDollar, 
-        MoscaBuyDollar,
-        MoscaSellDollar
-    } = api
-
-    const validBuyRates = [RapiraBuyDollar, ABCEXBuyDollar, MoscaBuyDollar]
-    .map(Number)
-    .filter(rate => !isNaN(rate));
-
-    const validSellRates = [RapiraSellDollar, ABCEXSellDollar, MoscaSellDollar]
-    .map(Number)
-    .filter(rate => !isNaN(rate));
-
-    const avgBuyRate = validBuyRates.length ? validBuyRates.reduce((sum, rate) => sum + rate, 0) / validBuyRates.length : 0;
-    const avgSellRate = validSellRates.length ? validSellRates.reduce((sum, rate) => sum + rate, 0) / validSellRates.length : 0;
+    const avgBuyRate = api.AVGDollarBuy
+    const avgSellRate = api.AVGDollarSell
 
     const city = {
         ...result[0],

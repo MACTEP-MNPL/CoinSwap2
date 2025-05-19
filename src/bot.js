@@ -11,6 +11,7 @@ import { createApi } from './api/createApi.js'
 import { hydrate } from '@grammyjs/hydrate'
 import { inlineMath } from './hears/mathHears.js'
 import { isAdmin } from './utils/userLvl.js'
+import { handleBotReply } from './hears/replyHears.js'
 
 
 dotenv.config()
@@ -181,6 +182,61 @@ bot.use(async (ctx, next) => {
     } catch (error) {
         console.error('Subscription check error:', error);
         return await next();
+    }
+});
+
+// Add a middleware to delete user commands after processing
+bot.use(async (ctx, next) => {
+    // Skip if not a message or not a command
+    if (!ctx.message?.text?.startsWith('/')) {
+        return next();
+    }
+    
+    // Store the message ID before processing
+    const messageId = ctx.message?.message_id;
+    const chatId = ctx.chat?.id;
+    
+    // Process the command/message
+    await next();
+    
+    // After processing, delete the user's message
+    if (messageId && chatId) {
+        try {
+            // Wait a short delay to make sure the bot's response is sent first
+            setTimeout(async () => {
+                try {
+                    await ctx.api.deleteMessage(chatId, messageId);
+                    console.log(`Deleted message ${messageId} in chat ${chatId}`);
+                } catch (deleteErr) {
+                    console.error('Error deleting message:', deleteErr);
+                }
+            }, 1000); // Increased delay to 1 second for more reliable deletion
+        } catch (error) {
+            console.error('Error in message deletion middleware:', error);
+        }
+    }
+});
+
+// Handle replies to bot messages
+bot.use(async (ctx, next) => {
+    try {
+        // Check if this is a reply to the bot's message
+        if (ctx.message?.reply_to_message?.from?.id === ctx.me.id) {
+            // Message is a reply to the bot
+            const text = ctx.message.text;
+            
+            if (text && !text.startsWith('/')) {
+                // Handle reply without command prefix using our handler
+                const handled = await handleBotReply(ctx);
+                if (handled) return; // Stop processing if handled
+            }
+        }
+        
+        // Continue to next middleware for normal commands
+        return next();
+    } catch (error) {
+        console.error('Error in reply handling middleware:', error);
+        return next();
     }
 });
 

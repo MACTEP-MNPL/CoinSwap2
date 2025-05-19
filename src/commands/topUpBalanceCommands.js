@@ -31,8 +31,15 @@ const handleBalanceUpdate = async (ctx, currency, commandName) => {
 
         // Replace keywords with their values
         expression = expression
-            .replace(/абц/g, api.ABCEXBuyDollar)
-            .replace(/,/g, '.');
+        .replace(/тез/g, api.AVGDollarBuy)
+        .replace(/цб/g, api.CBRFDollar)
+        .replace(/профинанс/g, api.ProFinanceDollar)
+        .replace(/инвест/g, api.InvestingDollar)
+        .replace(/рапира/g, api.RapiraBuyDollar)
+        .replace(/моска/g, api.MoscaBuyDollar)
+        .replace(/гринекс/g, api.GrinexBuyDollar)
+        .replace(/абц/g, api.ABCEXBuyDollar)
+        .replace(/,/g, '.');
 
         // Evaluate the expression
         let amount = math.evaluate(expression);

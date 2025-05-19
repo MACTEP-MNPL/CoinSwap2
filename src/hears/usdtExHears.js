@@ -9,7 +9,7 @@ const updateKeyboard = new InlineKeyboard()
 
 export const usdtExHears = new Composer()
 
-usdtExHears.hears('💹 USDT-Ex', async (ctx) => {
+usdtExHears.hears('💹 USDT-EX', async (ctx) => {
     if (!isPrivate(ctx)) return;
     if (!await isAdmin(ctx)) return;
 
