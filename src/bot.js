@@ -49,7 +49,6 @@ bot.use(conversations());
 // Define command lists
 const regularCommands = [
     { command: "start", description: "Запустить бота" },
-    { command: "b", description: "Проверить баланс на аккаунте" },
 ];
 
 const adminCommands = [
@@ -65,6 +64,9 @@ const adminCommands = [
     { command: "usdt_ex", description: "Курс USDT" },
     { command: "forex", description: "Курс forex" },
     { command: "city", description: "Курс в городах" },
+    { command: "xe", description: "Кросс-курс валют" },
+    { command: "msc", description: "Курс в Москве" },
+    { command: "mcx", description: "Курс в Махачкале" },
 ];
 
 // Function to set commands based on user level
@@ -187,14 +189,27 @@ bot.use(async (ctx, next) => {
 
 // Add a middleware to delete user commands after processing
 bot.use(async (ctx, next) => {
-    // Skip if not a message or not a command
+    // Only proceed if this is a message with text
     if (!ctx.message?.text?.startsWith('/')) {
         return next();
     }
     
+    // Extract the command name without parameters
+    const fullCommand = ctx.message.text.split(' ')[0]; // Get the first word
+    const commandName = fullCommand.split('@')[0].substring(1); // Remove the "/" and any bot username
+    
+    // Check if it's in our official command lists
+    const isOfficialCommand = regularCommands.some(cmd => cmd.command === commandName) ||
+                             adminCommands.some(cmd => cmd.command === commandName);
+    
+    // If it's not an official command, don't delete it
+    if (!isOfficialCommand) {
+        return next();
+    }
+    
     // Store the message ID before processing
-    const messageId = ctx.message?.message_id;
-    const chatId = ctx.chat?.id;
+    const messageId = ctx.message.message_id;
+    const chatId = ctx.chat.id;
     
     // Process the command/message
     await next();
@@ -206,9 +221,9 @@ bot.use(async (ctx, next) => {
             setTimeout(async () => {
                 try {
                     await ctx.api.deleteMessage(chatId, messageId);
-                    console.log(`Deleted message ${messageId} in chat ${chatId}`);
+                    console.log(`Deleted official command /${commandName} (${messageId}) in chat ${chatId}`);
                 } catch (deleteErr) {
-                    console.error('Error deleting message:', deleteErr);
+                    console.error(`Error deleting command /${commandName}:`, deleteErr);
                 }
             }, 1000); // Increased delay to 1 second for more reliable deletion
         } catch (error) {

@@ -14,7 +14,7 @@ import { getABCEXCommandMessage } from "../messages/getABCEXCommandMessage.js"
 import { InputFile } from "grammy"
 import { InlineKeyboard } from "grammy"
 import { isPrivate } from "../utils/isPrivate.js"
-
+import { getXERatesMessage } from "../messages/getXERatesMessage.js"
 
 export const englishCommands = new Composer()
 
@@ -626,6 +626,17 @@ englishCommands.command('send_users', async (ctx) => {
     } catch (error) {
         console.error('Error sending messages to users:', error)
         await ctx.reply('❌ Произошла ошибка при отправке сообщений')
+    }
+})
+
+englishCommands.command('xe', async (ctx) => {
+    if (!isPrivate(ctx)) {
+        return
+    }
+
+    if(await isAdmin(ctx)) {
+        const message = await getXERatesMessage(ctx)
+        await ctx.reply(message, {parse_mode: 'HTML', disable_web_page_preview: true})
     }
 })
 

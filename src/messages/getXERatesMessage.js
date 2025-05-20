@@ -5,8 +5,8 @@ export const getXERatesMessage = async (ctx) => {
     const { XEDollar, XEEUro, XEGBP, XECNY, XEKRW, XETimestamp } = api
 
     return (
-        `<blockquote>1 EUR = <code>${nFormat(XEDollar)}</code> USD\n\n` +
-        `1 USD = <code>${nFormat(XEEUro)}</code> EUR\n\n` +
+        `<blockquote>1 EUR = <code>${nFormat(XEEUro)}</code> USD\n\n` +
+        `1 USD = <code>${nFormat(XEDollar)}</code> EUR\n\n` +
         `1 USD = <code>${nFormat(XEGBP)}</code> GBP\n\n` +
         `1 USD = <code>${nFormat(XECNY)}</code> CNY\n\n` +
         `1 USD = <code>${nFormat(XEKRW)}</code> KRW\n</blockquote>` +

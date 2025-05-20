@@ -30,3 +30,11 @@ manageAdminsMenu.text("Снять админку (1 ур.)", async (ctx) => {
     await ctx.conversation.enter("makeUserConversation")
 })
 
+manageAdminsMenu.text("Снять админку (2 ур.)", async (ctx) => {
+    if(await isOwner(ctx)) {
+        return
+    }
+
+    await ctx.conversation.enter("remove2lvlAdminConversation")
+})
+

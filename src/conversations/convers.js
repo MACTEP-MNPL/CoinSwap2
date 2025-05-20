@@ -3,6 +3,7 @@ import { make1lvlAdminConversation, make2lvlAdminConversation, makeUserConversat
 import { createConversation } from "@grammyjs/conversations";
 import { updateCityMarginConversation } from "./manageTarifsConversations.js";
 import { deleteAccount } from "./deleteAccountConversation.js";
+import { remove2lvlAdminConversation } from "./manageAdminsConversations.js";
 export const convers = new Composer()
 
 
@@ -11,4 +12,4 @@ convers.use(createConversation(make1lvlAdminConversation))
 convers.use(createConversation(make2lvlAdminConversation))
 convers.use(createConversation(updateCityMarginConversation))
 convers.use(createConversation(deleteAccount))
-
+convers.use(createConversation(remove2lvlAdminConversation))

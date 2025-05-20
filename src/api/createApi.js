@@ -5,7 +5,7 @@ import { getRapiraBuyDollar, getRapiraSellDollar } from './feauters/Rapira.js'
 import { ABCEXBuyDollar, ABCEXSellDollar } from './feauters/ABCEX.js'
 import { getRussianStocksScanner } from './feauters/TradingViewScanner.js'
 import { getMoscaBuyDollar, getMoscaSellDollar } from './feauters/Mosca.js'
-import { getGrinexBuyDollar, getGrinexSellDollar } from './feauters/grinex.js'
+import { getGrinexBuyDollar, getGrinexSellDollar } from './feauters/Grinex.js'
 import { getXeRates } from './feauters/XE.js'
 import { getInvestingDollar, getInvestingEuro } from './feauters/Investing.js'
 

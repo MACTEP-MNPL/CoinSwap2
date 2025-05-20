@@ -83,3 +83,28 @@ export const makeUserConversation  = async (conversation, ctx) => {
         }
     )
 }   
+
+export const remove2lvlAdminConversation  = async (conversation, ctx) => {
+    await ctx.reply("Введите @username пользователя которого хотите удалить из администраторов:")
+
+    let username = (await conversation.waitFor("message:text")).message.text;
+
+    if (username.startsWith('@')) {
+        username = username.slice(1);
+    }
+
+    const user = await getUserByUsername(username)
+
+    if(!user) {
+        await ctx.reply("Пользователь с таким @username не существует. Нужно хотя бы раз воспользоваться ботом, чтобы попасть в базу данных.")
+        return
+    }
+
+    await removeAdminByUsername(username)
+
+    await ctx.reply(`Пользователь @${username} успешно удален из администраторов и теперь является обычным пользователем`,
+        {
+            reply_markup: adminPanelKeyboard
+        }
+    )
+}  
