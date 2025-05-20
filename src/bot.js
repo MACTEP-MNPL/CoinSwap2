@@ -189,18 +189,20 @@ bot.use(async (ctx, next) => {
 
 // Add a middleware to delete user commands after processing
 bot.use(async (ctx, next) => {
-    // Only proceed if this is a message with text
+    // Only proceed if this is a message with text starting with /
     if (!ctx.message?.text?.startsWith('/')) {
         return next();
     }
     
-    // Extract the command name without parameters
-    const fullCommand = ctx.message.text.split(' ')[0]; // Get the first word
-    const commandName = fullCommand.split('@')[0].substring(1); // Remove the "/" and any bot username
+    // Extract the command name without parameters but preserve any bot username
+    const fullCommand = ctx.message.text.split(' ')[0]; // Get the first word with potential @username
+    
+    // Also extract just the base command for matching against our list
+    const baseCommand = fullCommand.split('@')[0].substring(1); // Remove the "/" and any bot username
     
     // Check if it's in our official command lists
-    const isOfficialCommand = regularCommands.some(cmd => cmd.command === commandName) ||
-                             adminCommands.some(cmd => cmd.command === commandName);
+    const isOfficialCommand = regularCommands.some(cmd => cmd.command === baseCommand) ||
+                             adminCommands.some(cmd => cmd.command === baseCommand);
     
     // If it's not an official command, don't delete it
     if (!isOfficialCommand) {
@@ -221,11 +223,11 @@ bot.use(async (ctx, next) => {
             setTimeout(async () => {
                 try {
                     await ctx.api.deleteMessage(chatId, messageId);
-                    console.log(`Deleted official command /${commandName} (${messageId}) in chat ${chatId}`);
+                    console.log(`Deleted official command ${fullCommand} (${messageId}) in chat ${chatId}`);
                 } catch (deleteErr) {
-                    console.error(`Error deleting command /${commandName}:`, deleteErr);
+                    console.error(`Error deleting command ${fullCommand}:`, deleteErr);
                 }
-            }, 1000); // Increased delay to 1 second for more reliable deletion
+            }, 1000); // 1 second delay for more reliable deletion
         } catch (error) {
             console.error('Error in message deletion middleware:', error);
         }

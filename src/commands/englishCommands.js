@@ -630,9 +630,6 @@ englishCommands.command('send_users', async (ctx) => {
 })
 
 englishCommands.command('xe', async (ctx) => {
-    if (!isPrivate(ctx)) {
-        return
-    }
 
     if(await isAdmin(ctx)) {
         const message = await getXERatesMessage(ctx)
