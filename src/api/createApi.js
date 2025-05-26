@@ -60,8 +60,8 @@ export class createApi {
             this.CBRFDollar = nFormat(await getCBRFDollar()) //pox
             this.CBRFEuro = nFormat(await getCBRFEuro())
 
-            this.ABCEXBuyDollar = nFormat(await ABCEXBuyDollar()) // хз
-            this.ABCEXSellDollar = nFormat(await ABCEXSellDollar())
+            //this.ABCEXBuyDollar = nFormat(await ABCEXBuyDollar()) // хз
+            //this.ABCEXSellDollar = nFormat(await ABCEXSellDollar())
 
             this.MoscaBuyDollar = nFormat(await getMoscaBuyDollar())
             this.MoscaSellDollar = nFormat(await getMoscaSellDollar())
@@ -115,11 +115,11 @@ export class createApi {
 
             const {XEDollar, XEEUro, XEGBP, XECNY, XEKRW, XETimestamp} = await getXeRates()
 
-            this.XEDollar = XEDollar
-            this.XEEUro = XEEUro
-            this.XEGBP = XEGBP
-            this.XECNY = XECNY
-            this.XEKRW = XEKRW
+            this.XEDollar = Number(XEDollar).toFixed(4)
+            this.XEEUro = Number(XEEUro).toFixed(4)
+            this.XEGBP = Number(XEGBP).toFixed(4)
+            this.XECNY = Number(XECNY).toFixed(4)
+            this.XEKRW = Number(XEKRW).toFixed(4)
             XETimestamp.setHours(XETimestamp.getHours() + 3)
             this.XETimestamp = XETimestamp
 

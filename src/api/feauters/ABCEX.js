@@ -15,8 +15,6 @@ export const ABCEXBuyDollar = async () => {
     
     const data = await response.json();
 
-    console.log(data)
-    
     // For buying dollars (USDT), we use the askPrice
     // This is the price at which the exchange sells USDT to the user
     return data.ask[0].price;
@@ -40,8 +38,6 @@ export const ABCEXSellDollar = async () => {
     
     const data = await response.json();
 
-    console.log(data)
-    
     // For selling dollars (USDT), we use the bidPrice
     // This is the price at which the exchange buys USDT from the user
     return data.bid[0].price;

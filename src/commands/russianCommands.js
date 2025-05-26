@@ -69,7 +69,6 @@ russianCommands.hears(/^\/уведоми($|\s)/, async (ctx) => {
 
     try {
         const [chatIds] = await db.execute('SELECT chat_id FROM accounts')
-        console.log(chatIds)
         
         let successCount = 0
         let failCount = 0
@@ -356,8 +355,6 @@ russianCommands.hears(/^\/очисти\s+(.+)$/, async (ctx) => {
         await resetBalance(account.id, currency);
 
         await createNewTransaction(oldBalance[0].id, ctx.from.id, account.id, -oldBalance[0].balance,`ОБНУЛЕНИЕ СЧЕТА`, 0, ctx.message.message_id, currency)
-
-        console.log(oldBalance[0]);
         
         await ctx.reply(
             `<blockquote>#${account.name}</blockquote>\n\n` +

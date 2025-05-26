@@ -12,7 +12,7 @@ import { hydrate } from '@grammyjs/hydrate'
 import { inlineMath } from './hears/mathHears.js'
 import { isAdmin } from './utils/userLvl.js'
 import { handleBotReply } from './hears/replyHears.js'
-
+import { topUpBalanceHears } from './hears/topUpBalanceHears.js'
 
 dotenv.config()
 
@@ -267,7 +267,7 @@ bot.use(hears)
 
 bot.use(inlineMath)
 
-// Add chat_member update handler for join notifications
+
 bot.on("chat_member", async (ctx) => {
     try {
         const update = ctx.update.chat_member;
@@ -296,6 +296,8 @@ bot.on("chat_member", async (ctx) => {
         console.error('Error handling chat member update:', error);
     }
 });
+
+bot.use(topUpBalanceHears)
 
 bot.catch((err) => {
     const ctx = err.ctx;
@@ -355,11 +357,6 @@ pool.on('error', async (err) => {
     throw err;
   }
 });
-
-setInterval(() => {
-    const used = process.memoryUsage();
-    console.log(`Memory usage: ${Math.round(used.heapUsed / 1024 / 1024)}MB`);
-}, 300000); // Log every 5 minutes
 
 
 

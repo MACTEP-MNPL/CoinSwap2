@@ -54,7 +54,6 @@ export const manageTarifsMenu = new Menu("tarifs-menu")
 export const cityTarifMenu = new Menu("city-tarif-menu")
     .text("↑ Покупка +0.05%", async (ctx) => {
         try {
-            console.log(ctx.session)
             const cityId = ctx.session.selectedCityId;
             // Implement function to update buy margin by +0.05%
             await updateCityBuyMargin(cityId, 0.05);

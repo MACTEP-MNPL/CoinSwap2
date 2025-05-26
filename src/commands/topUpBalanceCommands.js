@@ -51,8 +51,6 @@ const handleBalanceUpdate = async (ctx, currency, commandName) => {
 
         const account = await getAccountByChat(ctx.chat.id);
 
-        console.log('account', account);
-
         if (!account) {
             await ctx.reply(
                 '❌ В этом чате нет аккаунта.\n' +
@@ -64,8 +62,6 @@ const handleBalanceUpdate = async (ctx, currency, commandName) => {
 
         // Get the balance before update
         const [balance] = await getBalanceByAccountIdAndCurrency(account.id, currency);
-
-        console.log('balance', balance);
         
         // Update the balance
         const newBalance = await updateBalance(ctx.chat.id, currency, amount);

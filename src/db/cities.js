@@ -108,8 +108,6 @@ export const updateCityBuyMargin = async (cityId, changeAmount) => {
             throw new Error("City not found");
         }
 
-        console.log(currentData)
-        
         const currentMargin = currentData[0].buy_margin;
         const newMargin = Math.max(0, Number(currentMargin) + Number(changeAmount)); // Prevent negative margins
         
@@ -138,8 +136,6 @@ export const updateCitySellMargin = async (cityId, changeAmount) => {
             throw new Error("City not found");
         }
 
-        console.log(currentData)
-        
         const currentMargin = currentData[0].sell_margin;
         const newMargin = Math.max(0, Number(currentMargin) + Number(changeAmount)); // Prevent negative margins
         
@@ -151,6 +147,60 @@ export const updateCitySellMargin = async (cityId, changeAmount) => {
         return newMargin;
     } catch (error) {
         console.error("Error updating sell margin:", error);
+        throw error;
+    }
+};
+
+export const updateDynamicMakhachkala = async (buyPrice, sellPrice) => {
+    try {
+        // Get current data first
+        const [currentData] = await db.execute('SELECT * FROM city WHERE name = ?', ['makhachkala']);
+        
+        // Check if the city exists
+        if (currentData.length === 0) {
+            // If not, create it
+            await db.execute(
+                'INSERT INTO city (name, buy_price, sell_price) VALUES (?, ?, ?)',
+                ['makhachkala', buyPrice, sellPrice]
+            );
+        } else {
+            // If it exists, update it
+            await db.execute(
+                'UPDATE city SET buy_price = ?, sell_price = ? WHERE name = ?',
+                [buyPrice, sellPrice, 'makhachkala']
+            );
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error updating Makhachkala prices:', error);
+        throw error;
+    }
+};
+
+export const updateDynamicMoscow = async (buyPrice, sellPrice) => {
+    try {
+        // Get current data first
+        const [currentData] = await db.execute('SELECT * FROM city WHERE name = ?', ['moscow']);
+        
+        // Check if the city exists
+        if (currentData.length === 0) {
+            // If not, create it
+            await db.execute(
+                'INSERT INTO city (name, buy_price, sell_price) VALUES (?, ?, ?)',
+                ['moscow', buyPrice, sellPrice]
+            );
+        } else {
+            // If it exists, update it
+            await db.execute(
+                'UPDATE city SET buy_price = ?, sell_price = ? WHERE name = ?',
+                [buyPrice, sellPrice, 'moscow']
+            );
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error updating Moscow prices:', error);
         throw error;
     }
 };
