@@ -32,7 +32,7 @@ export const undoTopUpMenu = new Menu('undoTopUpMenu')
             }
             
             // Get the transaction record
-            const [[transaction]] = await getTransactionByAccountIdAndMessageId(account.id, messageId);
+            const [transaction] = await getTransactionByAccountIdAndMessageId(account.id, messageId);
             
             if (!transaction) {
                 await ctx.reply("❌ Транзакция не найдена");
@@ -107,7 +107,10 @@ export const undoCreatingNewBalanceMenu = new Menu('undoCreatingNewBalanceMenu')
 
             const account = await getAccountByChat(ctx.chat.id);
 
-            const [[transaction]] = await getTransactionByAccountIdAndMessageId(account.id, messageId)
+            const [transaction] = await getTransactionByAccountIdAndMessageId(account.id, messageId)
+            //hhh
+            console.log(transaction)
+            
             const [balance] = await getBalanceById(transaction.balance_id);
             
             await deleteBalanceById(balance.id);
@@ -147,15 +150,13 @@ export const undoClearingBalanceMenu = new Menu('undoClearingBalanceMenu')
         if (!await isAdmin(ctx)) {
             return;
         }
-
+        
         const messageId = (ctx.update.callback_query.message.message_id - 1);
 
         try {
             const account = await getAccountByChat(ctx.chat.id);
-
-            const [[transaction]] = await getTransactionByAccountIdAndMessageId(account.id, messageId);
-
-            // Need to restore the original amount
+            const [transaction] = await getTransactionByAccountIdAndMessageId(account.id, messageId);
+            
             const restoredAmount = -transaction.amount;
             
             await updateBalance(ctx.chat.id, transaction.currency, restoredAmount);
@@ -199,7 +200,7 @@ export const undoDeletingNewBalanceMenu = new Menu('undoDeletingNewBalanceMenu')
         try {
             const account = await getAccountByChat(ctx.chat.id);
 
-            const [[transaction]] = await getTransactionByAccountIdAndMessageId(account.id, messageId);
+            const [transaction] = await getTransactionByAccountIdAndMessageId(account.id, messageId);
 
             // Create the balance with the original amount
             const restoredAmount = -transaction.amount;

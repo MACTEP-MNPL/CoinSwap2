@@ -234,6 +234,17 @@ bot.use(async (ctx, next) => {
     }
 });
 
+
+bot.use(convers)
+
+bot.use(menus)
+
+bot.use(commands)
+
+bot.use(hears)
+
+bot.use(inlineMath)
+
 // Handle replies to bot messages
 bot.use(async (ctx, next) => {
     try {
@@ -256,16 +267,6 @@ bot.use(async (ctx, next) => {
         return next();
     }
 });
-
-bot.use(convers)
-
-bot.use(menus)
-
-bot.use(commands)
-
-bot.use(hears)
-
-bot.use(inlineMath)
 
 
 bot.on("chat_member", async (ctx) => {

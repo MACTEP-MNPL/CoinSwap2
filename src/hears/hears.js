@@ -12,14 +12,7 @@ import { deleteAccountHears } from "./deleteAccountHears.js"
 
 export const hears = new Composer()
 
-// Create a composer for reply handling
-const replyHears = new Composer()
-replyHears.on('message', async (ctx, next) => {
-    // This will be handled by our middleware in bot.js
-    return next()
-})
 
-hears.use(replyHears)
 hears.use(adminPanelHears)
 hears.use(backHears)
 hears.use(adminsHears)

@@ -15,6 +15,9 @@ import { InputFile } from "grammy"
 import { InlineKeyboard } from "grammy"
 import { isPrivate } from "../utils/isPrivate.js"
 import { getXERatesMessage } from "../messages/getXERatesMessage.js"
+import { createNewTransaction } from "../db/transactions.js"
+
+
 
 export const englishCommands = new Composer()
 
@@ -225,17 +228,14 @@ englishCommands.command('clear', async (ctx) => {
 
         await resetBalance(account.id, currency);
 
-        ctx.session.undos[ctx.message.message_id] = {
-            currency: currency,
-            account: account,
-            amount: oldBalance[0].balance
-        }
+        await createNewTransaction(oldBalance[0].id, ctx.from.id, account.id, -oldBalance[0].balance,`ОЧИСТКА СЧЕТА`, 0, ctx.message.message_id, currency)
         
         await ctx.reply(
             `<blockquote>#${account.name}</blockquote>\n\n` +
             `✅ Баланс ${currency} обнулен`,
             {parse_mode: 'HTML', reply_markup: undoClearingBalanceMenu}
         );
+
     } catch (error) {
         if (error.message === 'BALANCE_NOT_FOUND') {
             await ctx.reply(
